@@ -26,8 +26,19 @@ class Library
         'patronymic',
     ];
 
+    private const GIVE_BOOK_VALID = [
+        'ISBN',
+        'reader'
+    ];
+
+    private const READER_VALID = [
+        'name',
+        'surname',
+        'patronymic',
+    ];
+
     public function __construct(
-        private readonly BookRepository $bookRepository,
+        private readonly BookRepository   $bookRepository,
         private readonly AuthorRepository $authorRepository,
         private readonly ReaderRepository $readerRepository
     )
@@ -39,11 +50,11 @@ class Library
      * @return void
      * @throws Exception
      */
-    private function validator(array $data): void
+    private function validatorAddBook(array $data): void
     {
         foreach (self::BOOK_VALID as $value) {
             if (!isset($data[$value])) {
-                throw new Exception('В книги не указан параметр '.$value);
+                throw new Exception('В книги не указан параметр ' . $value);
             }
         }
 
@@ -54,15 +65,35 @@ class Library
         foreach ($data['authors'] as $author) {
             foreach (self::AUTHOR_VALID as $value) {
                 if (!isset($author[$value])) {
-                    throw new Exception('В авторе не указан параметр '.$value);
+                    throw new Exception('В авторе не указан параметр ' . $value);
                 }
+            }
+        }
+    }
+
+    /**
+     * @param array $data
+     * @return void
+     * @throws Exception
+     */
+    private function validatorGiveBook(array $data): void
+    {
+        foreach (self::GIVE_BOOK_VALID as $value) {
+            if (!isset($data[$value])) {
+                throw new Exception('В книги не указан параметр ' . $value);
+            }
+        }
+
+        foreach (self::READER_VALID as $value) {
+            if (!isset($data['reader'][$value])) {
+                throw new Exception('В авторе не указан параметр ' . $value);
             }
         }
     }
 
     public function allBooks(): array
     {
-         $books = $this->bookRepository->allBooks();
+        $books = $this->bookRepository->allBooks();
 
         if ($books === null) {
             return ['allBooks' => 'Книги в библиотеке не найдены'];
@@ -78,7 +109,7 @@ class Library
      */
     public function addBook(array $data): array
     {
-        $this->validator($data);
+        $this->validatorAddBook($data);
 
         $book = $this->bookRepository->findOneBy(['ISBN' => $data['ISBN']]);
 
@@ -87,8 +118,7 @@ class Library
                 ->setName($data['name'])
                 ->setYearPublication($data['yearPublication'])
                 ->setISBN($data['ISBN'])
-                ->setCount($data['count'])
-            ;
+                ->setCount($data['count']);
             $this->bookRepository->add($newBook, false);
 
             foreach ($data['authors'] as $author) {
@@ -106,8 +136,7 @@ class Library
                         ->setName($author['name'])
                         ->setSurname($author['surname'])
                         ->setPatronymic($author['patronymic'])
-                        ->addBook($newBook)
-                    ;
+                        ->addBook($newBook);
                     $this->authorRepository->add($newAuthor, false);
                 } else {
                     $oldAuthor->addBook($newBook);
@@ -129,13 +158,7 @@ class Library
      */
     public function giveBook(array $data): array
     {
-        if (!isset($data['ISBN'])) {
-            throw new Exception('В книги не указан параметр ISBN');
-        }
-
-        if (!isset($data['reader'])) {
-            throw new Exception('В книги не указан параметр reader');
-        }
+        $this->validatorGiveBook($data);
 
         $book = $this->bookRepository->findOneBy(['ISBN' => $data['ISBN']]);
 
@@ -160,8 +183,7 @@ class Library
             $reader = (new Reader())
                 ->setName($data['reader']['name'])
                 ->setSurname($data['reader']['surname'])
-                ->setPatronymic($data['reader']['patronymic'])
-            ;
+                ->setPatronymic($data['reader']['patronymic']);
             $this->readerRepository->add($reader);
         }
 
