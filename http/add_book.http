@@ -1,0 +1,43 @@
+POST http://localhost:8000/api/add/book
+Content-Type: application/json
+
+{
+  "name": "Преступление и наказание",
+  "yearPublication": "1898",
+  "ISBN": "1234567890",
+  "count": 15,
+  "authors": [
+    {
+      "id": 1,
+      "name": "Фёдор",
+      "surname": "Достоевский",
+      "patronymic": "Михайлович"
+    }
+  ]
+}
+
+###
+
+POST http://localhost:8000/api/add/book
+Content-Type: application/json
+
+{
+  "name": "История Отечества",
+  "yearPublication": "2020",
+  "ISBN": "4789635412",
+  "count": 7,
+  "authors": [
+    {
+      "id": null,
+      "name": "Игорь",
+      "surname": "Иванов",
+      "patronymic": "Михайлович"
+    },
+    {
+      "id": null,
+      "name": "Петр",
+      "surname": "Сидоров",
+      "patronymic": "Андреевич"
+    }
+  ]
+}

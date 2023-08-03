@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    container_name: mysql
+    build:
+      context: ./mysql/docker
+      dockerfile: ./Dockerfile
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootroot
+      - MYSQL_DATABASE=StreamTelecom_library
+    volumes:
+      -  ./mysql/db:/var/lib/mysql
+    ports:
+      - "48700:3306"
