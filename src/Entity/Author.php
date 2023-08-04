@@ -27,13 +27,9 @@ class Author
     #[ORM\ManyToMany(targetEntity: Book::class, inversedBy: 'authors')]
     private Collection $books;
 
-    #[ORM\ManyToMany(targetEntity: DiscardBook::class, mappedBy: 'authors')]
-    private Collection $discardBooks;
-
     public function __construct()
     {
         $this->books = new ArrayCollection();
-        $this->discardBooks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -104,32 +100,5 @@ class Author
     public function getFullName(): string
     {
         return $this->surname . ' ' . $this->name . ' ' . $this->patronymic;
-    }
-
-    /**
-     * @return Collection<int, DiscardBook>
-     */
-    public function getDiscardBooks(): Collection
-    {
-        return $this->discardBooks;
-    }
-
-    public function addDiscardBook(DiscardBook $discardBook): static
-    {
-        if (!$this->discardBooks->contains($discardBook)) {
-            $this->discardBooks->add($discardBook);
-            $discardBook->addAuthor($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDiscardBook(DiscardBook $discardBook): static
-    {
-        if ($this->discardBooks->removeElement($discardBook)) {
-            $discardBook->removeAuthor($this);
-        }
-
-        return $this;
     }
 }

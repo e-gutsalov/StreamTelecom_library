@@ -2,11 +2,11 @@ POST http://localhost:8000/api/give/book
 Content-Type: application/json
 
 {
-  "ISBN": "1234567890",
+  "ISBN": "123456789",
   "reader": {
     "id": 1,
-    "name": "Фёдор",
-    "surname": "Достоевский",
+    "name": "Олег",
+    "surname": "Иванов",
     "patronymic": "Михайлович"
   }
 }

@@ -33,10 +33,14 @@ class Book
     #[ORM\ManyToMany(targetEntity: Reader::class, inversedBy: 'books')]
     private Collection $readers;
 
+    #[ORM\OneToMany(mappedBy: 'book', targetEntity: DiscardBook::class)]
+    private Collection $discardBook;
+
     public function __construct()
     {
         $this->authors = new ArrayCollection();
         $this->readers = new ArrayCollection();
+        $this->discardBook = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -139,6 +143,36 @@ class Book
     public function removeReader(Reader $reader): static
     {
         $this->readers->removeElement($reader);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DiscardBook>
+     */
+    public function getDiscardBook(): Collection
+    {
+        return $this->discardBook;
+    }
+
+    public function addDiscardBook(DiscardBook $discardBook): static
+    {
+        if (!$this->discardBook->contains($discardBook)) {
+            $this->discardBook->add($discardBook);
+            $discardBook->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDiscardBook(DiscardBook $discardBook): static
+    {
+        if ($this->discardBook->removeElement($discardBook)) {
+            // set the owning side to null (unless already changed)
+            if ($discardBook->getBook() === $this) {
+                $discardBook->setBook(null);
+            }
+        }
 
         return $this;
     }

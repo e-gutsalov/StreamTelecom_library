@@ -72,8 +72,23 @@ class LibraryController extends AbstractController
     }
 
     #[Route('/api/discard/book', name: 'discard_book')]
-    public function discardBook(): JsonResponse
+    public function discardBook(
+        Request $request,
+        Library $library
+    ): JsonResponse
     {
+        $response = new JsonResponse();
 
+        try {
+            $data = $request->toArray();
+            $result = $library->discardBook($data);
+            $response->setContent(json_encode($result));
+            $response->headers->set('Content-Type', 'application/json');
+
+        } catch (Exception $e) {
+            $response->setContent(json_encode(['error' => $e->getMessage()]));
+        }
+
+        return $response;
     }
 }

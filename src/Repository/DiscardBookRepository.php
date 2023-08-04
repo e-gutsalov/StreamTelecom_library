@@ -21,28 +21,24 @@ class DiscardBookRepository extends ServiceEntityRepository
         parent::__construct($registry, DiscardBook::class);
     }
 
-//    /**
-//     * @return DiscardBook[] Returns an array of DiscardBook objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('d.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function add(DiscardBook $entity, bool $flush = true): void
+    {
+        $this->_em->persist($entity);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }
 
-//    public function findOneBySomeField($value): ?DiscardBook
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function remove(DiscardBook $entity, bool $flush = true): void
+    {
+        $this->_em->remove($entity);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }
+
+    public function flush()
+    {
+        $this->_em->flush();
+    }
 }

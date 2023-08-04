@@ -4,9 +4,11 @@ namespace App\Service;
 
 use App\Entity\Author;
 use App\Entity\Book;
+use App\Entity\DiscardBook;
 use App\Entity\Reader;
 use App\Repository\AuthorRepository;
 use App\Repository\BookRepository;
+use App\Repository\DiscardBookRepository;
 use App\Repository\ReaderRepository;
 use Exception;
 
@@ -37,10 +39,16 @@ class Library
         'patronymic',
     ];
 
+    private const DISCARD_BOOK = [
+        'ISBN',
+        'reason'
+    ];
+
     public function __construct(
         private readonly BookRepository   $bookRepository,
         private readonly AuthorRepository $authorRepository,
-        private readonly ReaderRepository $readerRepository
+        private readonly ReaderRepository $readerRepository,
+        private readonly DiscardBookRepository $discardBookRepository
     )
     {
     }
@@ -54,7 +62,7 @@ class Library
     {
         foreach (self::BOOK_VALID as $value) {
             if (!isset($data[$value])) {
-                throw new Exception('В книги не указан параметр ' . $value);
+                throw new Exception('В книги не указан параметр '.$value);
             }
         }
 
@@ -65,7 +73,7 @@ class Library
         foreach ($data['authors'] as $author) {
             foreach (self::AUTHOR_VALID as $value) {
                 if (!isset($author[$value])) {
-                    throw new Exception('В авторе не указан параметр ' . $value);
+                    throw new Exception('В авторе не указан параметр '.$value);
                 }
             }
         }
@@ -80,13 +88,27 @@ class Library
     {
         foreach (self::GIVE_BOOK_VALID as $value) {
             if (!isset($data[$value])) {
-                throw new Exception('В книги не указан параметр ' . $value);
+                throw new Exception('В книги не указан параметр '.$value);
             }
         }
 
         foreach (self::READER_VALID as $value) {
             if (!isset($data['reader'][$value])) {
-                throw new Exception('В авторе не указан параметр ' . $value);
+                throw new Exception('В авторе не указан параметр '.$value);
+            }
+        }
+    }
+
+    /**
+     * @param array $data
+     * @return void
+     * @throws Exception
+     */
+    private function validatorDiscardBook(array $data): void
+    {
+        foreach (self::DISCARD_BOOK as $value) {
+            if (!isset($data[$value])) {
+                throw new Exception('При списании книги не указан параметр '.$value);
             }
         }
     }
@@ -177,8 +199,6 @@ class Library
             }
         }
 
-        $book->setCount($book->getCount() - 1);
-
         if ($reader === null) {
             $reader = (new Reader())
                 ->setName($data['reader']['name'])
@@ -187,9 +207,41 @@ class Library
             $this->readerRepository->add($reader);
         }
 
+        $book->setCount($book->getCount() - 1);
+
         $reader->addBook($book);
         $this->readerRepository->flush();
 
-        return [];
+        return [
+            'readerId' => $reader->getId(),
+            'bookId' => $book->getId()
+        ];
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function discardBook(array $data): array
+    {
+        $this->validatorDiscardBook();
+
+        $book = $this->bookRepository->findOneBy(['ISBN' => $data['ISBN']]);
+
+        if ($book === null) {
+            throw new Exception('Запрошенной книги нет в библиотеке');
+        }
+
+        $discard = (new DiscardBook())
+            ->setBook($book)
+            ->setReason($data['reason'])
+            ;
+
+        $book->setCount($book->getCount() - 1);
+        $this->discardBookRepository->add($discard);
+
+        return [
+            'discard' => true,
+            'discardId' => $discard->getId()
+        ];
     }
 }
