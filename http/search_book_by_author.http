@@ -1,0 +1,17 @@
+POST http://localhost:8000/api/search/book
+Content-Type: application/json
+
+{
+  "authors": [
+    {
+      "name": "Фёдор",
+      "surname": "Достоевский",
+      "patronymic": "Михайлович"
+    },
+    {
+      "name": "Петр",
+      "surname": "Сидоров",
+      "patronymic": "Андреевич"
+    }
+  ]
+}

@@ -19,5 +19,3 @@
 ###< symfony/phpunit-bridge ###
 .idea
 /mysql/db/
-/public/uploads/
-!/public/uploads/bookblack.png

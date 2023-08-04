@@ -42,29 +42,4 @@ class AuthorRepository extends ServiceEntityRepository
     {
         $this->_em->flush();
     }
-
-    /**
-     * @param Author $author
-     * @return Author|null
-     * @throws NonUniqueResultException
-     */
-    public function checkAuthor(Author $author): Author|null
-    {
-        $qb = $this->createQueryBuilder('a');
-        return $qb
-            ->select()
-            ->andWhere(
-                $qb->expr()->like('a.name', ':name'),
-                $qb->expr()->like('a.surname', ':surname'),
-                $qb->expr()->like('a.patronymic', ':patronymic'),
-            )
-            ->setParameters([
-                'name' => $author->getName(),
-                'surname' => $author->getSurname(),
-                'patronymic' => $author->getPatronymic(),
-            ])
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
 }

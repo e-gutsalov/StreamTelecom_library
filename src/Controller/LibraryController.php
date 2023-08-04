@@ -29,6 +29,27 @@ class LibraryController extends AbstractController
         return $response;
     }
 
+    #[Route('/api/search/book', name: 'search_books')]
+    public function searchBookByAuthor(
+        Request $request,
+        Library $library
+    ): JsonResponse
+    {
+        $response = new JsonResponse();
+
+        try {
+            $data = $request->toArray();
+            $result = $library->searchBookByAuthor($data);
+            $response->setContent(json_encode($result));
+            $response->headers->set('Content-Type', 'application/json');
+
+        } catch (Exception $e) {
+            $response->setContent(json_encode(['error' => $e->getMessage()]));
+        }
+
+        return $response;
+    }
+
     #[Route('/api/add/book', name: 'add_books')]
     public function addBook(
         Request $request,

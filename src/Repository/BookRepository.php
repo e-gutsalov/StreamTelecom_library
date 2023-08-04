@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Book;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -44,36 +43,6 @@ class BookRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param Book $book
-     * @return Book|null
-     * @throws NonUniqueResultException
-     */
-    public function checkBook(Book $book): Book|null
-    {
-        $qb = $this->createQueryBuilder('b');
-        return $qb
-            ->select()
-            ->orWhere(
-                $qb->expr()->andX(
-                    $qb->expr()->like('b.name', ':name'),
-                    $qb->expr()->like('b.ISBN', ':ISBN')
-                ),
-                $qb->expr()->andX(
-                    $qb->expr()->like('b.name', ':name'),
-                    $qb->expr()->like('b.yearPublication', ':yearPublication')
-                )
-            )
-            ->setParameters([
-                'name' => $book->getName(),
-                'ISBN' => $book->getISBN(),
-                'yearPublication' => $book->getYearPublication(),
-            ])
-            ->getQuery()
-            ->getOneOrNullResult()
-            ;
-    }
-
-    /**
      * @return array|null
      */
     public function allBooks(): ?array
@@ -83,7 +52,35 @@ class BookRepository extends ServiceEntityRepository
             ->select('b', 'a')
             ->join('b.authors', 'a')
             ->getQuery()
-            ->getArrayResult()
-            ;
+            ->getArrayResult();
+    }
+
+    /**
+     * @param array $data
+     * @return array|null
+     */
+    public function searchBookByAuthor(array $data): ?array
+    {
+        $qb = $this->createQueryBuilder('b');
+        $qb
+            ->select('b', 'a')
+            ->join('b.authors', 'a');
+
+        foreach ($data['authors'] as $key => $author) {
+            $qb->orWhere(
+                $qb->expr()->andX(
+                    $qb->expr()->like('a.name', ':name_'.$key),
+                    $qb->expr()->like('a.surname', ':surname_'.$key),
+                    $qb->expr()->like('a.patronymic', ':patronymic_'.$key),
+                )
+            )
+                ->setParameter('name_'.$key, $author['name'])
+                ->setParameter('surname_'.$key, $author['surname'])
+                ->setParameter('patronymic_'.$key, $author['patronymic']);
+        }
+
+        return $qb
+                ->getQuery()
+                ->getArrayResult();
     }
 }

@@ -113,12 +113,50 @@ class Library
         }
     }
 
+    /**
+     * @param array $data
+     * @return void
+     * @throws Exception
+     */
+    private function validatorSearchBookByAuthor(array $data): void
+    {
+        if (!isset($data['authors'])) {
+            throw new Exception('Не указан параметр authors');
+        }
+
+        foreach ($data['authors'] as $author) {
+            foreach (self::AUTHOR_VALID as $value) {
+                if (!isset($author[$value])) {
+                    throw new Exception('В авторе не указан параметр '.$value);
+                }
+            }
+        }
+    }
+
     public function allBooks(): array
     {
         $books = $this->bookRepository->allBooks();
 
         if ($books === null) {
             return ['allBooks' => 'Книги в библиотеке не найдены'];
+        }
+
+        return $books;
+    }
+
+    /**
+     * @param array $data
+     * @return string[]
+     * @throws Exception
+     */
+    public function searchBookByAuthor(array $data): array
+    {
+        $this->validatorSearchBookByAuthor($data);
+
+        $books = $this->bookRepository->searchBookByAuthor($data);
+
+        if ($books === null) {
+            return ['searchBookByAuthor' => 'Книги в библиотеке не найдены'];
         }
 
         return $books;
