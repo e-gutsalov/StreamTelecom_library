@@ -16,6 +16,15 @@
 
 # Описание работы с API:
 
+## Запуск докера, создание базы и миграции
+
+В .env раскомментировать строчку DATABASE_URL="mysql://root:rootroot@127.0.0.1:48700/StreamTelecom_library"
+
+composer docker-up 
+composer docker-down
+composer ddc // создать БД
+composer dmm // применить миграции
+
 ## Примеры запросов приведены в директории http в корне проекта
 
 ### Добавить книгу с указанием авторов
