@@ -261,7 +261,7 @@ class Library
      */
     public function discardBook(array $data): array
     {
-        $this->validatorDiscardBook();
+        $this->validatorDiscardBook($data);
 
         $book = $this->bookRepository->findOneBy(['ISBN' => $data['ISBN']]);
 
